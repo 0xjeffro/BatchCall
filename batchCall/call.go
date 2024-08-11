@@ -1,22 +1,30 @@
 package batchCall
 
-type Operation func(interface{}) (interface{}, error)
+type Operation[T any, U any] func(T) (U, error)
 
-type Result struct {
+type Result[T any, U any] struct {
 	Id       int
 	RetryCnt int
-	Params   interface{}
-	Result   interface{}
+	Params   T
+	Result   U
 	Errors   []error
 }
 
-func BathCall(params []interface{}, op Operation, nWorkers int, maxRetry int) []Result {
-	results := make([]Result, len(params))
-	resultChan := make(chan Result, len(params))
-	jobs := make(chan Result, len(params))
+type BatchCall[T any, U any] struct {
+	Params []T
+	Op     Operation[T, U]
+}
+
+func (p *BatchCall[T, U]) Call(nWorkers int, maxRetry int) []Result[T, U] {
+	params := p.Params
+	op := p.Op
+
+	results := make([]Result[T, U], len(params))
+	resultChan := make(chan Result[T, U], len(params))
+	jobs := make(chan Result[T, U], len(params))
 
 	for i, p := range params {
-		jobs <- Result{
+		jobs <- Result[T, U]{
 			Id:       i,
 			RetryCnt: 0,
 			Params:   p,
