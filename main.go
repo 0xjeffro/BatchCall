@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/0xjeffro/BatchCall.git/batchCall"
+	"github.com/0xjeffro/BatchCall/batchCall"
 	"math/rand"
 	"time"
 )
